@@ -1,5 +1,4 @@
 function game() {
-
 	let canvas = document.getElementById('canvas'),
 		ctx = canvas.getContext('2d'),
 		gravity = 9.81,
@@ -11,12 +10,17 @@ function game() {
 	Img.player.src = './img/tank.png';
 	Img.shell.src = './img/shell.png';
 	Img.map.src = './img/map.png';
-		player = {
-			x: 140,
-			y: 78,
+	ctx.mozImageSmoothingEnabled = false; //better graphics for pixel art
+	ctx.msImageSmoothingEnabled = false;
+	ctx.imageSmoothingEnabled = false;
+	
+	let	player = {
+			x: 0,
+			y: 0,
 			angle : 180,
 			stepAngle : 22.5,
 			power : 80,
+			height : Img.player.height,
 			aimPosition : 0,
 		},
 		shell = {
@@ -28,15 +32,13 @@ function game() {
 			t : 0,
 		};
 
-	ctx.mozImageSmoothingEnabled = false; //better graphics for pixel art
-	ctx.msImageSmoothingEnabled = false;
-	ctx.imageSmoothingEnabled = false;
-
+	
+		
 	window.addEventListener('keydown', function(){
 		if (event.keyCode == 65)
-			aim(event);
+			player.aim(event);
 		else if (event.keyCode == 68)
-			aim(event);
+			player.aim(event);
 		else if (event.keyCode == 87)
 			player.power+=5;
 		else if (event.keyCode == 83)
@@ -45,17 +47,26 @@ function game() {
 			player.shoot();
 	});
 
-
-	player.draw = function(){
+	player.draw = function () {
 		ctx.drawImage(Img.player, player.aimPosition * (Img.player.width / 9), 0, Img.player.width / 9, Img.player.height, player.x, player.y, Img.player.width / 9, Img.player.height);
 	}
-	Img.map.onload = function () {
-		ctx.drawImage(Img.map, 0, 0);
-		player.draw();
-	}	
+
+	player.position = function(){
+		let randomPos = Math.round(Math.random()* (mapPositions.length -1));
+		player.x = mapPositions[randomPos][1] * 32;
+		player.y = mapPositions[randomPos][0] * 32 - (Img.player.height - 17);
+		if(player.x < canvas.width / 2){
+			player.aimPosition = 8;
+			player.angle = 0;
+		}
+		else{
+			player.aimPosition = 0;
+			player.angle = 180;
+		}
+	};
 
 	player.shoot = function(){
-		if (shell.y > canvas.height || shell.y < 0 || shell.x > canvas.width || shell.x < 0)
+		if (shell.y > canvas.height || shell.y + Img.shell.width < 0 || shell.x > canvas.width || shell.x + Img.shell.width < 0)
 			return;
 		if(shell.framePosition > 18)
 			shell.framePosition = 18;
@@ -76,10 +87,15 @@ function game() {
 		if(Math.ceil(shell.t) % 2 == 0)
 			shell.framePosition ++;
 		requestAnimationFrame(player.shoot);
-	}	
+	}
 
+	Img.map.onload = function () {
+		ctx.drawImage(Img.map, 0, 0);
+		player.position();
+		player.draw();
+	}
 
-	function aim(event){
+	player.aim = function(event){
 		if (event.keyCode == 68) {
 			player.aimPosition ++;
 			player.angle = Math.abs(player.aimPosition * player.stepAngle - 180);
@@ -101,60 +117,25 @@ function game() {
 		ctx.save();
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.drawImage(Img.map, 0, 0);
-		ctx.drawImage(Img.player, player.aimPosition * (Img.player.width / 9), 0, (Img.player.width / 9), Img.player.height, player.x, player.y, Img.player.width / 9, Img.player.height);
+		player.draw();
 		ctx.restore();
 		console.log(Math.floor(player.angle));
 	}
 
+	let array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let array2D = [],
+		mapPositions = [];
 
-
-	console.log(canvas.width)
-	var array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 75, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 75, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 71, 72, 73, 74, 75, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	var array2D = [];
-	for(var i = 0 ; i < 14; i++){
+	for(let i = 0 ; i < 14; i++){
 		array2D[i] = [];
-		for(var j = 0 ; j < 28; j++){
+		for(let j = 0 ; j < 28; j++){
 			array2D[i][j] = array[i * 28 + j];
+			if(array2D[i][j] != 0)
+				mapPositions.push([i, j])
 		}
 	}
 
-	console.log(array2D);
-
-
-// parameters - change to your liking
- // var STEP_MAX = 2.5;
- // var STEP_CHANGE = 1.0;
- // var HEIGHT_MAX = canvas.height;
-
- // // starting conditions
- // var height = Math.random() * HEIGHT_MAX;
- // var slope = (Math.random() * STEP_MAX) * 2 - STEP_MAX;
-
- // // creating the landscape
- // for (var x = 0; x < canvas.width; x++) {
- //      // change height and slope
- //      height += slope;
- //      slope += (Math.random() * STEP_CHANGE) * 2 - STEP_CHANGE;
-
- //      // clip height and slope to maximum
- //      if (slope > STEP_MAX) { slope = STEP_MAX };
- //      if (slope < -STEP_MAX) { slope = -STEP_MAX };
- 
- //      if (height > HEIGHT_MAX) { 
- //          height = HEIGHT_MAX;
- //          slope *= -1;
- //      }
- //      if (height < 0) { 
- //          height = 0;
- //          slope *= -1;
- //      }
-      
- //      // draw column
- //      ctx.beginPath();
- //      ctx.moveTo(x, HEIGHT_MAX);
- //      ctx.lineTo(x, height);
- //      ctx.stroke();
- // }
+	console.log(mapPositions);
 }
 
 game();
