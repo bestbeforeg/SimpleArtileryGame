@@ -93,6 +93,8 @@ function game() {
 		}
 	};
 
+
+	let isShooting = false;
 	let shoot = function(player){
 		//calculate trajectory
 		let vx = player.power * Math.cos(player.angle/180*Math.PI),
@@ -112,16 +114,16 @@ function game() {
 		ctx.drawImage(Img.shell, shell.framePosition * Img.shell.width / 19, 0, Img.shell.width / 19, Img.shell.height, shell.x, shell.y, Img.shell.width / 19, Img.shell.height);
 		ctx.restore();
 
-
+		isShooting = true;
 		
 		if(Math.ceil(shell.t) % 2 == 0)
 			shell.framePosition ++;
 
 		if (shell.y > canvas.height || shell.y + Img.shell.height < 0 || shell.x > canvas.width || shell.x + Img.shell.width / 9 < 0){
+			isShooting = false;
 			clearInterval(shootTimer);
 			turn++;
 			round();
-			return;
 		}
 
 		if(shell.framePosition > 18)
@@ -187,15 +189,15 @@ function game() {
 	}
 
 	window.addEventListener('keydown', function(){
-		if(event.keyCode == 65 && !isGameOver)
+		if(event.keyCode == 65 && !isGameOver && !isShooting)
 			aim(event, curPlayer);
-		else if (event.keyCode == 68 && !isGameOver)
+		else if (event.keyCode == 68 && !isGameOver  && !isShooting)
 			aim(event, curPlayer);
-		else if (event.keyCode == 87 && !isGameOver)
+		else if (event.keyCode == 87 && !isGameOver  && !isShooting)
 			curPlayer.power+=5;
-		else if (event.keyCode == 83 && !isGameOver)
+		else if (event.keyCode == 83 && !isGameOver  && !isShooting)
 			curPlayer.power-=5;
-		else if (event.keyCode == 32 && !isGameOver)
+		else if (event.keyCode == 32 && !isGameOver  && !isShooting)
 			shootTimer = setInterval( function () {
 				shoot(curPlayer);
 			}, 18);
@@ -206,7 +208,6 @@ function game() {
 		console.log(curPlayer.name + ' wins');
 
 		let gameInfo = document.getElementById('gameInfo');
-		//gameInfo.style.height = '100px';
 
 		let killedPlayer;
 		if(curPlayer == player1)
@@ -215,6 +216,7 @@ function game() {
 			killedPlayer = player1;
 
 
+		//params for explosion	
 		let explodeFrame = 0,
 			explodeCount = 0,
 			explodeImg = new Image(),
@@ -227,11 +229,11 @@ function game() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(Img.map, 0, 0);
 
+			//draw explosion
 			ctx.drawImage(explodeImg, explodeFrame * explodeWidth / 5, explodeCount * explodeHeight, explodeWidth / 5, explodeHeight, killedPlayer.x, killedPlayer.y - 20, explodeWidth / 5, explodeHeight);
 
 			draw(curPlayer);
 			ctx.restore();
-
 
 			explodeFrame++;
 			if(explodeFrame == 5){
