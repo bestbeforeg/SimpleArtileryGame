@@ -10,7 +10,23 @@
 </head>
 
 <body>
-	<div id="gameInfo"></div>
+	<div id="gameInfo">
+		<h1>Simple Arcade Tank Game</h1>
+		<form action="" id="users">
+			<label for="player1_name">Player 1 name</label> 
+			<input type="text" name="player" id="player1_name" required="required"><br>
+			<label for="player2_name">Player 2 name</label> 
+			<input type="text" name="" id="player2_name" required="required"><br>
+			<input type="submit" id='startGame' value="Start Game">
+		</form>
+		<h2>Controls:</h2>
+		<p>Use 'A' or 'D' to aim and 'W' and 'S' to set power. Use spacebar to shoot.</p>
+	</div>
+	<div id="restart">
+		<h1 id='winner'></h1>
+		<h2>Play another one?</h2>
+		<button id="restartGame">Play</button>
+	</div>
 	<div id="playerInfo"></div>
 	<canvas id="canvas" width="896" height="448"></canvas>
 	<script src="js/tanks.js"></script>

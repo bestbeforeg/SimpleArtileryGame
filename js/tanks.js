@@ -1,4 +1,4 @@
-function game() {
+function game(name1, name2) {
 	let canvas = document.getElementById('canvas'),
 		playerInfo = document.getElementById('playerInfo'),
 		ctx = canvas.getContext('2d'),
@@ -26,7 +26,7 @@ function game() {
 	ctx.imageSmoothingEnabled = false;
 		
 	let	player1 = {
-			name : 'Player 1',
+			name : name1,
 			x: 0,
 			y: 0,	
 			angle : 180,
@@ -36,7 +36,7 @@ function game() {
 			img : Img.player1,
 		},
 		player2 = {
-			name : 'Player 2',
+			name : name2,
 			x: 0,
 			y: 0,
 			angle : 180,
@@ -57,40 +57,7 @@ function game() {
 		draw(player2);
 	}
 
-	// ctx.save();
-	// ctx.font = "22px Arial";
-	// ctx.fillStyle = 'white';
-	// ctx.fillText('curPlayer.name',10,50);
-	// ctx.restore();
-
-	// let startGame = function(){
-	// 	turn = 1,
-	// 	isGameOver = false,
-	// 	isShooting = false,
-	// 	player1 = {
-	// 		name : 'Player 1',
-	// 		x: 0,
-	// 		y: 0,	
-	// 		angle : 180,
-	// 		stepAngle : 22.5,
-	// 		power : 80,
-	// 		aimPosition : 0,
-	// 		img : Img.player1,
-	// 	},
-	// 	player2 = {
-	// 		name : 'Player 2',
-	// 		x: 0,
-	// 		y: 0,
-	// 		angle : 180,
-	// 		stepAngle : 22.5,
-	// 		power : 80,
-	// 		aimPosition : 0,
-	// 		img : Img.player2,
-	// 	};
-	// }
-
 	let round = function () {
-
 		if(turn % 2 == 0)
 			curPlayer = player2;
 		else
@@ -242,20 +209,14 @@ function game() {
 			shootTimer = setInterval( function () {
 				shoot(curPlayer);
 			}, 18);
-	});	
+	});
 
 	let gameOver = function (player) {
-		console.log('Game over');
-		console.log(curPlayer.name + ' wins');
-
-		let gameInfo = document.getElementById('gameInfo');
-
 		let killedPlayer;
 		if(curPlayer == player1)
 			killedPlayer = player2;
 		else
 			killedPlayer = player1;
-
 
 		//params for explosion	
 		let explodeFrame = 0,
@@ -278,10 +239,26 @@ function game() {
 				explodeCount++;
 				explodeFrame = 0
 			}
-			if(explodeFrame == 25)
+			if(explodeCount > 5){
 				clearInterval(explosion);
+				restarGame();
+			}
+		}, 80);
+	}
 
-		}, 40);
+	let restarGame = function(){
+		let restart = document.getElementById('restart'),
+			restartGame = document.getElementById('restartGame'),
+			winner = document.getElementById('winner');
+
+		winner.innerHTML = curPlayer.name + ' wins!';
+		restart.style.display = 'block';
+
+		restartGame.onclick = function(){
+			restart.style.display = 'none';
+			game(player1_name, player2_name);
+			console.log(player1_name);
+		}
 	}
 
 	//map from tiled.com
@@ -302,4 +279,22 @@ function game() {
 	round();
 }
 
-game();
+let gameInfo = document.getElementById('gameInfo'),
+	startBtn = document.getElementById('startGame');
+	player1_name,
+	player2_name;
+
+
+startBtn.addEventListener('click', function(event) {	
+	player1_name = document.getElementById('player1_name').value,
+	player2_name = document.getElementById('player2_name').value;
+
+	if(player1_name == '' || player2_name == ''){
+		alert('Please enter name!');
+	}
+	else{
+		gameInfo.style.display = 'none';
+		game(player1_name, player2_name);
+		event.preventDefault();
+	}
+});
